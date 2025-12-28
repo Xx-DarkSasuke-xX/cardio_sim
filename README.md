@@ -33,21 +33,19 @@ The system evolves three state variables:
 
 The dynamics follow from mass and momentum conservation in a lumped framework:
 
-\begin{equation}
-\begin{cases}
-C_{LV}(t)\,\dfrac{dp_{LV}}{dt}
-+ p_{LV}(t)\,\dfrac{dC_{LV}}{dt}
-= \alpha(t) - \beta(t), \\[6pt]
-I_{\mathrm{art}}\,\dfrac{dQ_2}{dt}
-= p_1(t) - p_{RA}
-- \left(R_{h,\mathrm{cap}} + R_{h,\mathrm{art}}\right) Q_2(t), \\[6pt]
-C_{\mathrm{art}}\,\dfrac{dp_1}{dt}
-= \beta(t) - Q_2(t).
-\end{cases}
-\label{eq:global_ode_system}
-\end{equation}
+$$
+C_{LV}(t)\.\frac{dp_{LV}}{dt} = -p_{LV}\.\frac{dC_{LV}}{dt} + Q_{MV} - Q_{AV}
+$$
 
-where $C_{LV}(t)$ is a prescribed time-varying compliance representing the cardiac cycle, and valve flows $\alpha(t)$ and $\beta(t)$ are modelled using smoothed Heaviside functions to avoid discontinuities.
+$$
+C_{art}\.\frac{dp_1}{dt} = Q_{AV} - Q_2
+$$
+
+$$
+I_{art}\.\frac{dQ_2}{dt} = p_1 - p_{RA} - R_{tot}\,Q_2
+$$
+
+where $C_{LV}(t)$ is a prescribed time-varying compliance representing the cardiac cycle, and valve flows $Q_{MV}$, $Q_{AV}$ are modelled using smoothed Heaviside functions to avoid discontinuities.
 
 ### Linearized arterial subsystem
 
