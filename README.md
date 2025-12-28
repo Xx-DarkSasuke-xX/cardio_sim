@@ -17,39 +17,7 @@ The codebase supports both nonlinear time-domain simulation and linearized syste
 
 ---
 
-## Mathematical Model
 
-### State variables
-
-The system evolves three state variables:
-
-| Symbol | Description | Unit |
-|--------|-------------|------|
-| $p_{LV}$ | Left ventricular pressure | mmHg |
-| $p_1$ | Aortic (arterial) pressure | mmHg |
-| $Q_2$ | Peripheral arterial flow | mL/s |
-
-### Governing equations
-
-The dynamics follow from mass and momentum conservation in a lumped framework:
-
-$$
-C_{LV}(t)\.\frac{dp_{LV}}{dt} = -p_{LV}\.\frac{dC_{LV}}{dt} + Q_{MV} - Q_{AV}
-$$
-
-$$
-C_{art}\.\frac{dp_1}{dt} = Q_{AV} - Q_2
-$$
-
-$$
-I_{art}\.\frac{dQ_2}{dt} = p_1 - p_{RA} - R_{tot}\.Q_2
-$$
-
-where $C_{LV}(t)$ is a prescribed time-varying compliance representing the cardiac cycle, and valve flows $Q_{MV}$, $Q_{AV}$ are modelled using smoothed Heaviside functions to avoid discontinuities.
-
-### Linearized arterial subsystem
-
-For system-theoretic analysis, the arterial network (downstream of the aortic valve) is linearized around a steady operating point. This yields a second-order transfer function relating inlet flow perturbations to arterial pressure, enabling classical observability and identifiability studies.
 
 ---
 
