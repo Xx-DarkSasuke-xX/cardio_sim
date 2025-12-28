@@ -42,7 +42,7 @@ C_{art}\.\frac{dp_1}{dt} = Q_{AV} - Q_2
 $$
 
 $$
-I_{art}\.\frac{dQ_2}{dt} = p_1 - p_{RA} - R_{tot}\,Q_2
+I_{art}\.\frac{dQ_2}{dt} = p_1 - p_{RA} - R_{tot}\.Q_2
 $$
 
 where $C_{LV}(t)$ is a prescribed time-varying compliance representing the cardiac cycle, and valve flows $Q_{MV}$, $Q_{AV}$ are modelled using smoothed Heaviside functions to avoid discontinuities.
