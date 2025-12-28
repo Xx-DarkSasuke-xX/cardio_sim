@@ -1,81 +1,148 @@
-
 # Cardiovascular Systemic Circulation Simulator (0D)
 
-## Overview
-This repository contains a modular Python implementation of a lumped-parameter (0D) model for the systemic cardiovascular circulation. The model focuses on the interaction between the left ventricle and the arterial system, allowing simulation and comparison of healthy and pathological hemodynamics. The codebase is organized for clarity, reproducibility, and ease of extension.
+A lumped-parameter model of the systemic circulation coupling left ventricular dynamics with an arterial Windkessel network.
 
-## Features
-- Simulates systemic circulation using a nonlinear ODE model
-- Models left ventricular activation, time-varying compliance, and valve dynamics
-- Supports healthy and pathological scenarios (e.g., arterial stiffening, increased afterload)
-- Linearization tools for system-theoretic analysis (observability, identifiability)
-- Generates time-resolved pressure, flow, and volume waveforms
-- Produces publication-ready plots and exports figures
-- Includes unit tests for physiological and numerical components
+---
 
-## Project Structure
+## Introduction
 
-- `cardio/config`: Default simulation and parameter settings
-- `cardio/params`: Parameter sets for healthy and pathological cases
-- `cardio/physiology`: Ventricular activation, compliance, and valve models
-- `cardio/models`: System equations and signal reconstruction
-- `cardio/simulation`: Integration routines and simulation pipelines
-- `cardio/analysis`: Metrics, linearization, observability, identifiability
-- `cardio/plotting`: Plotting utilities for waveforms and LTI analysis
-- `scripts`: Example scripts for running simulations and exporting figures
-- `tests`: Unit tests for model components
-- `exports`: Output directory for generated figures
+This project implements a zero-dimensional (0D) cardiovascular model in Python. The model describes the interaction between the left ventricle and the systemic arterial tree using ordinary differential equations derived from hydraulic analogies. It was developed as part of coursework at the École Polytechnique de Bruxelles.
 
-## How to Run Simulations
+The simulator captures key hemodynamic phenomena:
+- Time-varying ventricular elastance (contraction/relaxation cycle)
+- Nonlinear valve dynamics (mitral and aortic)
+- Arterial compliance and peripheral resistance (Windkessel approach)
 
-1. **Healthy scenario:**
-	- Run `python scripts/run_healthy.py` to simulate and plot a healthy cardiac cycle.
+The codebase supports both nonlinear time-domain simulation and linearized system-theoretic analysis (observability, identifiability).
 
-2. **Pathology comparison:**
-	- Run `python scripts/run_compare_pathology.py` to compare healthy and pathological (e.g., arterial stiffening) conditions. Key metrics and plots are shown for both cases.
+---
 
-3. **Linear analysis:**
-	- Run `python scripts/run_lti_analysis.py` for linearized arterial system analysis (poles, zeros, observability, identifiability, LTI plots).
+## Mathematical Model
 
-4. **Exporting figures:**
-	- Use `python scripts/export_figures.py` and `python scripts/export_lti_figures.py` to generate and save figures to the `exports/` directory.
+### State variables
 
-## Model Details
+The system evolves three state variables:
 
-- **State variables:**
-  - Left ventricular pressure (pLV)
-  - Peripheral arterial flow (Q2)
-  - Aortic pressure (p1)
-- **Auxiliary signals:**
-  - Left ventricular volume (Vlv)
-  - Ventricular compliance (Clv) and elastance (Elv)
-  - Mitral and aortic valve flows (P0, P1)
-- **Measured output:**
-  - Arterial pressure (p1) is the main observable
+| Symbol | Description | Unit |
+|--------|-------------|------|
+| $p_{LV}$ | Left ventricular pressure | mmHg |
+| $p_1$ | Aortic (arterial) pressure | mmHg |
+| $Q_2$ | Peripheral arterial flow | mL/s |
 
-## Pathology Modeling
-Pathological scenarios are created by modifying arterial compliance and resistance parameters, representing conditions such as arteriosclerosis. The model structure remains unchanged, ensuring that differences reflect only parameter changes. Pathology parameters are configurable in `cardio/params/pathology.py`.
+### Governing equations
 
-## Numerical Approach
-- Integrates the nonlinear ODE system over multiple cardiac cycles
-- Smooths valve transitions for numerical stability
-- Analyzes the final converged cycle for metrics and plots
+The dynamics follow from mass and momentum conservation in a lumped framework:
 
-## Testing
-Unit tests are provided in the `tests/` directory. Run with your preferred test runner, e.g.:
+$$
+C_{LV}(t)\,\frac{dp_{LV}}{dt} = -p_{LV}\,\frac{dC_{LV}}{dt} + Q_{MV} - Q_{AV}
+$$
+
+$$
+C_{art}\,\frac{dp_1}{dt} = Q_{AV} - Q_2
+$$
+
+$$
+I_{art}\,\frac{dQ_2}{dt} = p_1 - p_{RA} - R_{tot}\,Q_2
+$$
+
+where $C_{LV}(t)$ is a prescribed time-varying compliance representing the cardiac cycle, and valve flows $Q_{MV}$, $Q_{AV}$ are modelled using smoothed Heaviside functions to avoid discontinuities.
+
+### Linearized arterial subsystem
+
+For system-theoretic analysis, the arterial network (downstream of the aortic valve) is linearized around a steady operating point. This yields a second-order transfer function relating inlet flow perturbations to arterial pressure, enabling classical observability and identifiability studies.
+
+---
+
+## Installation
+
+**Requirements:** Python ≥ 3.8
+
+```bash
+pip install numpy scipy matplotlib
+```
+
+Clone the repository and run scripts directly—no package installation is required.
+
+---
+
+## Usage
+
+### Simulate a healthy cardiac cycle
+
+```bash
+python scripts/run_healthy.py
+```
+
+This runs 10 cardiac cycles, prints hemodynamic metrics (SBP, DBP, MAP, stroke volume), and displays pressure–volume loops and waveform plots.
+
+### Compare healthy vs. pathological conditions
+
+```bash
+python scripts/run_compare_pathology.py
+```
+
+Pathology is modelled by altering arterial compliance and resistance (e.g., arterial stiffening). Both scenarios are simulated and compared side by side.
+
+### Linear system analysis
+
+```bash
+python scripts/run_lti_analysis.py
+```
+
+Computes poles, zeros, Bode plots, observability matrix rank, and identifiability metrics for the linearized arterial model.
+
+### Export figures
+
+```bash
+python scripts/export_figures.py
+python scripts/export_lti_figures.py
+```
+
+Figures are saved to `exports/figures/` and `exports/figures_lti/`.
+
+---
+
+## Project layout
 
 ```
+cardio/
+├── config/       # Simulation settings, default parameters
+├── params/       # Parameter sets (healthy, pathology)
+├── physiology/   # Activation function, compliance, valve models
+├── models/       # ODE right-hand side, signal reconstruction
+├── simulation/   # Integrators, initial conditions, pipeline
+├── analysis/     # Metrics, linearization, observability, identifiability
+└── plotting/     # Waveform and LTI visualisation
+
+scripts/          # Entry points for common tasks
+tests/            # Unit tests (pytest)
+exports/          # Generated figures
+```
+
+---
+
+## Testing
+
+```bash
 pytest tests/
 ```
 
-## Requirements
-- Python 3.8+
-- numpy, scipy, matplotlib
+Tests cover activation functions, compliance models, and ODE right-hand side behaviour at physiological limits.
 
-## Roadmap
-- Interfaces and dataclasses for parameters and results
-- Global simulation pipeline
-- Physiological equations and integration
-- Pathology scenarios and system-theoretic analysis
+---
+
+## Authors
+
+| Name | Email | Affiliation |
+|------|-------|-------------|
+| Tahar Mansouri | tahar.mansouri@ulb.be | École Polytechnique de Bruxelles, ULB |
+| Joshua Otu | joshua.otu@ulb.be | École Polytechnique de Bruxelles, ULB |
+| Mamadou Tambassa | mamadou.tambassa@ulb.be | École Polytechnique de Bruxelles, ULB |
+
+---
+
+## License
+
+This project was developed for educational purposes. Contact the authors for reuse or collaboration.
 
 
